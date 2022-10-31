@@ -7,6 +7,16 @@ from typing import Union
 
 logger = getLogger()
 
+OPERATORS_MAP = {
+    ast.Add: Operators.ADD,
+    ast.Sub: Operators.SUB,
+    ast.Mult: Operators.MUL,
+    ast.Div: Operators.DIV,
+    ast.Pow: Operators.POW,
+    ast.USub: Operators.NEG,
+    ast.UAdd: Operators.ID
+}
+
 
 def eval_node(ast_node: Union[ast.Constant, ast.Name, ast.BinOp, ast.UnaryOp]) -> Node:
     """Evaluate and dispatch to one of eval method depending on the type of ast_node"""
@@ -21,8 +31,8 @@ def eval_binop(ast_node: ast.BinOp) -> BinaryNode:
     log = logger.bind(func='eval binop')
     log.debug(ast.dump(ast_node))
     op_type = OPERATORS_MAP[type(ast_node.op)]
-    op = Operators.get(op_type)
-    return BinaryNode(left=eval_node(ast_node.left), right=eval_node(ast_node.right), func=op)
+    # op = Operators.get(op_type)
+    return BinaryNode(left=eval_node(ast_node.left), right=eval_node(ast_node.right), func_type=op_type)
 
 
 def eval_constant(ast_node: ast.Constant) -> ConstantNode:
@@ -44,8 +54,7 @@ def eval_unaryop(ast_node: ast.UnaryOp) -> UnaryNode:
     log = logger.bind(func='eval unary')
     log.debug(ast.dump(ast_node))
     op_type = OPERATORS_MAP[type(ast_node.op)]
-    op = Operators.get(op_type)
-    return UnaryNode(func=op, value=eval_node(ast_node.operand))
+    return UnaryNode(func_type=op_type, value=eval_node(ast_node.operand))
 
 
 def from_string(equation_string: str) -> Node:
@@ -65,14 +74,4 @@ AST_EVALUATORS = {
     ast.Name: eval_name,
     ast.BinOp: eval_binop,
     ast.UnaryOp: eval_unaryop,
-}
-
-OPERATORS_MAP = {
-    ast.Add: Operators.ADD,
-    ast.Sub: Operators.SUB,
-    ast.Mult: Operators.MUL,
-    ast.Div: Operators.DIV,
-    ast.Pow: Operators.POW,
-    ast.USub: Operators.NEG,
-    ast.UAdd: Operators.ID
 }
