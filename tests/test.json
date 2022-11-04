@@ -1,0 +1,107 @@
+[
+    {
+        "input": "1+2",
+        "output": {
+            "type": "binary",
+            "left": {
+                "type": "constant",
+                "value": 1
+            },
+            "right": {
+                "type": "constant",
+                "value": 2
+            },
+            "func_type": "add"
+        }
+    },
+    {
+        "input": "(1.2*col_1) + 2*col_2 / 100",
+        "output": {
+            "type": "binary",
+            "left": {
+                "type": "binary",
+                "left": {
+                    "type": "constant",
+                    "value": 1.2
+                },
+                "right": {
+                    "type": "variable",
+                    "value": "col_1"
+                },
+                "func_type": "mul"
+            },
+            "right": {
+                "type": "binary",
+                "left": {
+                    "type": "binary",
+                    "left": {
+                        "type": "constant",
+                        "value": 2
+                    },
+                    "right": {
+                        "type": "variable",
+                        "value": "col_2"
+                    },
+                    "func_type": "mul"
+                },
+                "right": {
+                    "type": "constant",
+                    "value": 100
+                },
+                "func_type": "div"
+            },
+            "func_type": "add"
+        }
+    },
+    {
+        "input": "- 1 * col_1+2 -(3*col_2)/(col_1) ",
+        "output": {
+            "type": "binary",
+            "left": {
+                "type": "binary",
+                "left": {
+                    "type": "binary",
+                    "left": {
+                        "type": "unary",
+                        "value": {
+                            "type": "constant",
+                            "value": 1
+                        },
+                        "func_type": "neg"
+                    },
+                    "right": {
+                        "type": "variable",
+                        "value": "col_1"
+                    },
+                    "func_type": "mul"
+                },
+                "right": {
+                    "type": "constant",
+                    "value": 2
+                },
+                "func_type": "add"
+            },
+            "right": {
+                "type": "binary",
+                "left": {
+                    "type": "binary",
+                    "left": {
+                        "type": "constant",
+                        "value": 3
+                    },
+                    "right": {
+                        "type": "variable",
+                        "value": "col_2"
+                    },
+                    "func_type": "mul"
+                },
+                "right": {
+                    "type": "variable",
+                    "value": "col_1"
+                },
+                "func_type": "div"
+            },
+            "func_type": "sub"
+        }
+    }
+]

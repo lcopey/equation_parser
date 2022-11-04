@@ -1,20 +1,20 @@
 from collections import OrderedDict
-import pandas as pd
-from .constants import Operators, NodeType
 from typing import Union
 
+import pandas as pd
 
-def from_dict(datas: dict):
-    node_type = datas.pop('type')
-    node_class = NODES_DEFINITION[node_type]
-    return node_class(**datas)
+from .constants import NodeType, Operators, RESERVED_NAME
 
 
 class Node:
     """Basic structure for all nodes"""
 
-    def __repr__(self):
-        return f'<{self.__class__.__name__}>'
+    def __repr__(self, level=0):
+        if level == 0:
+            sep = ''
+        else:
+            sep = '    ' * (level - 1) + ' |--'
+        return f'{sep}<{self.__class__.__name__}>'
 
     def eval(self, *args):
         """General evaluation method"""
@@ -24,14 +24,24 @@ class Node:
         """Serialize to dict"""
         raise NotImplementedError
 
+    def __eq__(self, other: 'Node'):
+        return self.serialize() == other.serialize()
+
+    @classmethod
+    def from_dict(cls, datas: dict):
+        """Instantiate the tree structure from existing serialized Tree as dictionary"""
+        node_type = datas.pop('type')
+        node_class = NODES_DEFINITION[node_type]
+        return node_class(**datas)
+
 
 class UnaryNode(Node):
     """Node implementing unary operation"""
 
     def __init__(self, value: Union[Node, dict], func_type):
         if isinstance(value, dict):
-            value = from_dict(value)
-        self.value = value
+            value = Node.from_dict(value)
+        self.value: Node = value
         self.func_type = func_type
         self.func = Operators.get(func_type)
 
@@ -45,15 +55,19 @@ class UnaryNode(Node):
                             ('value', self.value.serialize()),
                             ('func_type', self.func_type)])
 
+    def __repr__(self, level=0):
+        return (f"""{super().__repr__(level)}: {self.func_type}\n"""
+                f"""{self.value.__repr__(level + 1)}""")
+
 
 class BinaryNode(Node):
     """Node implementing binary operation"""
 
     def __init__(self, left: Union[Node, dict], right: Union[Node, dict], func_type):
         if isinstance(left, dict):
-            left = from_dict(left)
+            left = Node.from_dict(left)
         if isinstance(right, dict):
-            right = from_dict(right)
+            right = Node.from_dict(right)
         self.left = left
         self.right = right
         self.func_type = func_type
@@ -63,25 +77,35 @@ class BinaryNode(Node):
         """Apply func to left and right value"""
         return self.func(self.left.eval(datas), self.right.eval(datas))
 
-    def __repr__(self):
-        return (f"""{super().__repr__()} {self.func}"""
-                f"""\n\tleft={self.left.__repr__()}\n\tright={self.right.__repr__()}""")
-
     def serialize(self) -> OrderedDict:
         return OrderedDict([('type', NodeType.Binary),
                             ('left', self.left.serialize()),
                             ('right', self.right.serialize()),
                             ('func_type', self.func_type)])
 
+    def __repr__(self, level=0):
+        return (f"""{super().__repr__(level)}: {self.func_type}\n"""
+                f"""{self.left.__repr__(level + 1)}\n"""
+                f"""{self.right.__repr__(level + 1)}""")
 
-class ConstantNode(Node):
-    """Node implementing constant value"""
+
+class TerminalNode(Node):
+    """Base class for terminal Node"""
 
     def __init__(self, value):
         self.value = value
 
+    def __repr__(self, level=0):
+        return f"""{super().__repr__(level)}: {self.value}"""
+
+
+class ConstantNode(TerminalNode):
+    """Node implementing constant value"""
+
     def eval(self, datas: pd.DataFrame):
         """Return value"""
+        if self.value in RESERVED_NAME.keys():
+            return RESERVED_NAME[self.value]
         return self.value
 
     def serialize(self) -> OrderedDict:
@@ -90,11 +114,8 @@ class ConstantNode(Node):
                             ('value', self.value)])
 
 
-class VariableNode(Node):
+class VariableNode(TerminalNode):
     """Node implementing variable name"""
-
-    def __init__(self, value):
-        self.value = value
 
     def eval(self, datas: pd.DataFrame):
         """Return the columns in datas named value"""

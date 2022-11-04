@@ -1,5 +1,8 @@
 import operator
+import math
 from enum import Enum
+
+RESERVED_NAME = {'pi': math.pi}
 
 
 class NodeType(str, Enum):
@@ -24,11 +27,6 @@ class Operators(str, Enum):
     def get(value):
         """Return the function corresponding the enumeration value"""
         return OPERATORS_FUNC.get(value)
-
-    # @classmethod
-    # def as_dict(cls) -> dict:
-    #     """Returns Operators class as dictionary"""
-    #     return {value.value: value for value in cls}
 
 
 OPERATORS_FUNC = {

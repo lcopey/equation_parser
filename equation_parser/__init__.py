@@ -1,4 +1,3 @@
-from .from_ast import from_string
+from .base import BinaryNode, ConstantNode, Node, UnaryNode, VariableNode
 from .constants import Operators
-from .base import ConstantNode, VariableNode, BinaryNode, UnaryNode
-from .base import from_dict
+from .from_ast import from_string

@@ -1,9 +1,10 @@
 import ast
-from structlog import getLogger
-from .base import Node, BinaryNode, ConstantNode, VariableNode, UnaryNode
-from .constants import Operators
-
 from typing import Union
+
+from structlog import getLogger
+
+from .base import BinaryNode, ConstantNode, Node, UnaryNode, VariableNode
+from .constants import Operators, RESERVED_NAME
 
 logger = getLogger()
 
@@ -42,11 +43,14 @@ def eval_constant(ast_node: ast.Constant) -> ConstantNode:
     return ConstantNode(value=ast_node.value)
 
 
-def eval_name(ast_node: ast.Name) -> VariableNode:
+def eval_name(ast_node: ast.Name) -> Union[VariableNode, ConstantNode]:
     """Defines a variable node"""
     log = logger.bind(func='eval name')
     log.debug(ast.dump(ast_node))
-    return VariableNode(value=ast_node.id)
+    if ast_node.id in RESERVED_NAME.keys():
+        return ConstantNode(value=ast_node.id)
+    else:
+        return VariableNode(value=ast_node.id)
 
 
 def eval_unaryop(ast_node: ast.UnaryOp) -> UnaryNode:
