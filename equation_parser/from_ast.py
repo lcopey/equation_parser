@@ -15,7 +15,15 @@ OPERATORS_MAP = {
     ast.Div: Operators.DIV,
     ast.Pow: Operators.POW,
     ast.USub: Operators.NEG,
-    ast.UAdd: Operators.ID
+    ast.UAdd: Operators.ID,
+    'sin': Operators.SIN,
+    'cos': Operators.COS,
+    'tan': Operators.TAN,
+    'atan': Operators.ATAN,
+    'arctan': Operators.ATAN,
+    'arctan2': Operators.ATAN,
+    'abs': Operators.ABS,
+    'exp': Operators.EXP
 }
 
 
@@ -32,7 +40,6 @@ def eval_binop(ast_node: ast.BinOp) -> BinaryNode:
     log = logger.bind(func='eval binop')
     log.debug(ast.dump(ast_node))
     op_type = OPERATORS_MAP[type(ast_node.op)]
-    # op = Operators.get(op_type)
     return BinaryNode(left=eval_node(ast_node.left), right=eval_node(ast_node.right), func_type=op_type)
 
 
@@ -54,11 +61,20 @@ def eval_name(ast_node: ast.Name) -> Union[VariableNode, ConstantNode]:
 
 
 def eval_unaryop(ast_node: ast.UnaryOp) -> UnaryNode:
-    """Degines a unary operation node"""
+    """Defines a unary operation node"""
     log = logger.bind(func='eval unary')
     log.debug(ast.dump(ast_node))
     op_type = OPERATORS_MAP[type(ast_node.op)]
     return UnaryNode(func_type=op_type, value=eval_node(ast_node.operand))
+
+
+def eval_call(ast_node: ast.Call) -> UnaryNode:
+    """Evaluate function call, mainly supports unary function such as sin and cos"""
+    log = logger.bind(func='eval Call')
+    log.debug(ast.dump(ast_node))
+    op_type = OPERATORS_MAP[ast_node.func.id.lower()]
+    arg = ast_node.args[0]
+    return UnaryNode(func_type=op_type, value=eval_node(arg))    
 
 
 def from_string(equation_string: str) -> Node:
@@ -78,4 +94,5 @@ AST_EVALUATORS = {
     ast.Name: eval_name,
     ast.BinOp: eval_binop,
     ast.UnaryOp: eval_unaryop,
+    ast.Call: eval_call,
 }

@@ -1,6 +1,8 @@
 import operator
 import math
 from enum import Enum
+import numpy as np
+
 
 RESERVED_NAME = {'pi': math.pi}
 
@@ -22,6 +24,12 @@ class Operators(str, Enum):
     POW = 'pow'
     NEG = 'neg'
     ID = 'id'
+    SIN = 'sin'
+    COS = 'cos'
+    TAN = 'tan'
+    ATAN = 'atan'
+    ABS = 'abs'
+    EXP = 'exp'
 
     @staticmethod
     def get(value):
@@ -37,4 +45,10 @@ OPERATORS_FUNC = {
     Operators.POW: operator.pow,
     Operators.NEG: operator.neg,
     Operators.ID: lambda x: x,
+    Operators.SIN: np.sin,
+    Operators.COS: np.cos,
+    Operators.TAN: np.tan,
+    Operators.ATAN: np.arctan2,
+    Operators.ABS: np.abs,
+    Operators.EXP: np.exp
 }
