@@ -4,7 +4,7 @@ from typing import Union
 from structlog import getLogger
 
 from .base import BinaryNode, ConstantNode, Node, UnaryNode, VariableNode
-from .constants import Operators, RESERVED_NAME
+from .constants import RESERVED_NAME, Operators
 
 logger = getLogger()
 
@@ -23,7 +23,9 @@ OPERATORS_MAP = {
     'arctan': Operators.ATAN,
     'arctan2': Operators.ATAN,
     'abs': Operators.ABS,
-    'exp': Operators.EXP
+    'exp': Operators.EXP,
+    'delta': Operators.DELTA,
+    'b100': Operators.B100
 }
 
 
@@ -74,7 +76,7 @@ def eval_call(ast_node: ast.Call) -> UnaryNode:
     log.debug(ast.dump(ast_node))
     op_type = OPERATORS_MAP[ast_node.func.id.lower()]
     arg = ast_node.args[0]
-    return UnaryNode(func_type=op_type, value=eval_node(arg))    
+    return UnaryNode(func_type=op_type, value=eval_node(arg))
 
 
 def from_string(equation_string: str) -> Node:

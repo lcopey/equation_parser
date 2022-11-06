@@ -1,8 +1,10 @@
-import operator
 import math
+import operator
 from enum import Enum
+
 import numpy as np
 
+from .functions import identity, relative_percentage, delta
 
 RESERVED_NAME = {'pi': math.pi}
 
@@ -30,6 +32,8 @@ class Operators(str, Enum):
     ATAN = 'atan'
     ABS = 'abs'
     EXP = 'exp'
+    B100 = 'b100'
+    DELTA = 'delta'
 
     @staticmethod
     def get(value):
@@ -44,11 +48,13 @@ OPERATORS_FUNC = {
     Operators.DIV: operator.truediv,
     Operators.POW: operator.pow,
     Operators.NEG: operator.neg,
-    Operators.ID: lambda x: x,
+    Operators.ID: identity,
     Operators.SIN: np.sin,
     Operators.COS: np.cos,
     Operators.TAN: np.tan,
     Operators.ATAN: np.arctan2,
     Operators.ABS: np.abs,
-    Operators.EXP: np.exp
+    Operators.EXP: np.exp,
+    Operators.B100: relative_percentage,
+    Operators.DELTA: delta
 }

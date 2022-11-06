@@ -1,9 +1,10 @@
+"""Implement base object that constitutes the tree of computation"""
 from collections import OrderedDict
 from typing import Union
 
 import pandas as pd
 
-from .constants import NodeType, Operators, RESERVED_NAME
+from .constants import RESERVED_NAME, NodeType, Operators
 
 
 class Node:
@@ -16,7 +17,7 @@ class Node:
             sep = '    ' * (level - 1) + ' |--'
         return f'{sep}<{self.__class__.__name__}>'
 
-    def eval(self, *args):
+    def eval(self, *args, **kwargs):
         """General evaluation method"""
         raise NotImplementedError
 
@@ -45,9 +46,9 @@ class UnaryNode(Node):
         self.func_type = func_type
         self.func = Operators.get(func_type)
 
-    def eval(self, datas: pd.DataFrame):
+    def eval(self, datas: pd.DataFrame, *args, **kwargs):
         """Apply func to value"""
-        return self.func(self.value.eval(datas))
+        return self.func(self.value.eval(datas, *args, **kwargs), *args, **kwargs)
 
     def serialize(self) -> OrderedDict:
         """Serialize to Ordered dict"""
@@ -73,9 +74,9 @@ class BinaryNode(Node):
         self.func_type = func_type
         self.func = Operators.get(func_type)
 
-    def eval(self, datas: pd.DataFrame):
+    def eval(self, datas: pd.DataFrame, *args, **kwargs):
         """Apply func to left and right value"""
-        return self.func(self.left.eval(datas), self.right.eval(datas))
+        return self.func(self.left.eval(datas, *args, **kwargs), self.right.eval(datas, *args, **kwargs))
 
     def serialize(self) -> OrderedDict:
         return OrderedDict([('type', NodeType.Binary),
@@ -98,11 +99,17 @@ class TerminalNode(Node):
     def __repr__(self, level=0):
         return f"""{super().__repr__(level)}: {self.value}"""
 
+    def eval(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def serialize(self) -> OrderedDict:
+        raise NotImplementedError
+
 
 class ConstantNode(TerminalNode):
     """Node implementing constant value"""
 
-    def eval(self, datas: pd.DataFrame):
+    def eval(self, datas: pd.DataFrame, *args, **kwargs):
         """Return value"""
         if self.value in RESERVED_NAME.keys():
             return RESERVED_NAME[self.value]
@@ -117,7 +124,7 @@ class ConstantNode(TerminalNode):
 class VariableNode(TerminalNode):
     """Node implementing variable name"""
 
-    def eval(self, datas: pd.DataFrame):
+    def eval(self, datas: pd.DataFrame, *args, **kwargs):
         """Return the columns in datas named value"""
         return datas[self.value]
 

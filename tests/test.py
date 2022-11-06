@@ -1,6 +1,7 @@
-from equation_parser import from_string, Node
-from unittest import TestCase
 import json
+from unittest import TestCase
+
+from equation_parser import Node, from_string
 
 
 class ParserTest(TestCase):
