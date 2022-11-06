@@ -25,7 +25,8 @@ OPERATORS_MAP = {
     'abs': Operators.ABS,
     'exp': Operators.EXP,
     'delta': Operators.DELTA,
-    'b100': Operators.B100
+    'b100': Operators.B100,
+    'sqrt': Operators.SQRT
 }
 
 

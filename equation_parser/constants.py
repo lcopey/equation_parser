@@ -34,6 +34,7 @@ class Operators(str, Enum):
     EXP = 'exp'
     B100 = 'b100'
     DELTA = 'delta'
+    SQRT = 'sqrt'
 
     @staticmethod
     def get(value):
@@ -56,5 +57,6 @@ OPERATORS_FUNC = {
     Operators.ABS: np.abs,
     Operators.EXP: np.exp,
     Operators.B100: relative_percentage,
-    Operators.DELTA: delta
+    Operators.DELTA: delta,
+    Operators.SQRT: np.sqrt
 }
